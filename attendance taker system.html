@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Taker System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+        }
+        .actions {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .present, .absent {
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .present {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .absent {
+            background-color: #f44336;
+            color: white;
+        }
+        .add-student {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .add-student input {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        .editable {
+            background-color: #eef;
+            border: 1px solid #ccc;
+            padding: 5px;
+            text-align: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Attendance Taker System</h1>
+
+        <div class="add-student">
+            <input type="text" id="studentName" placeholder="Enter Student Name">
+            <button onclick="addStudent()">Add Student</button>
+        </div>
+
+        <table id="attendanceTable">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Total Working Days</th>
+                    <th>Days Present</th>
+                    <th>Days Absent</th>
+                    <th>Attendance (%)</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let studentId = 0;
+
+        function addStudent() {
+            const studentNameInput = document.getElementById('studentName');
+            const studentName = studentNameInput.value.trim();
+
+            if (studentName === '') {
+                alert('Please enter a student name.');
+                return;
+            }
+
+            studentId++;
+            const tableBody = document.querySelector('#attendanceTable tbody');
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${studentName}</td>
+                <td><input type="number" id="total-${studentId}" class="editable" value="0" min="0" onchange="updatePercentage(${studentId})"></td>
+                <td id="present-${studentId}">0</td>
+                <td id="absent-${studentId}">0</td>
+                <td id="percentage-${studentId}">0%</td>
+                <td>
+                    <button class="present" onclick="markAttendance(${studentId}, true)">Mark Present</button>
+                    <button class="absent" onclick="markAttendance(${studentId}, false)">Mark Absent</button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+            studentNameInput.value = '';
+        }
+
+        function markAttendance(id, isPresent) {
+            const totalCell = document.getElementById(`total-${id}`);
+            const presentCell = document.getElementById(`present-${id}`);
+            const absentCell = document.getElementById(`absent-${id}`);
+            const percentageCell = document.getElementById(`percentage-${id}`);
+
+            let total = parseInt(totalCell.value);
+            let present = parseInt(presentCell.innerText);
+            let absent = parseInt(absentCell.innerText);
+
+            if (isPresent) {
+                present += 1;
+            } else {
+                absent += 1;
+            }
+
+            total = present + absent;
+            totalCell.value = total;
+
+            const percentage = ((present / total) * 100).toFixed(2);
+
+            presentCell.innerText = present;
+            absentCell.innerText = absent;
+            percentageCell.innerText = `${percentage}%`;
+        }
+
+        function updatePercentage(id) {
+            const totalCell = document.getElementById(`total-${id}`);
+            const presentCell = document.getElementById(`present-${id}`);
+            const percentageCell = document.getElementById(`percentage-${id}`);
+
+            let total = parseInt(totalCell.value);
+            let present = parseInt(presentCell.innerText);
+
+            const percentage = total > 0 ? ((present / total) * 100).toFixed(2) : 0;
+            percentageCell.innerText = `${percentage}%`;
+        }
+    </script>
+</body>
+</html>
